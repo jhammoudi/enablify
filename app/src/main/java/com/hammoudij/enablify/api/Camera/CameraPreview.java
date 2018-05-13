@@ -1,13 +1,15 @@
-package com.hammoudij.enablify.api;
+package com.hammoudij.enablify.api.Camera;
 
 import android.content.Context;
-//import android.graphics.Camera;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.FrameLayout;
+
+import com.hammoudij.enablify.R;
 
 import java.io.IOException;
 import java.util.List;
@@ -104,21 +106,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
             mCamera.setDisplayOrientation(90);
-//            Camera.Parameters parameters = mCamera.getParameters();
-//            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-//                parameters.set("orientation", "portrait");
-//                mCamera.setDisplayOrientation(90);
-//                parameters.setRotation(90);
-//            }
-//            else {
-//                // This is an undocumented although widely known feature
-//                parameters.set("orientation", "landscape");
-//                // For Android 2.2 and above
-//                mCamera.setDisplayOrientation(0);
-//                // Uncomment for Android 2.0 and above
-//                parameters.setRotation(0);
-//            }
-
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
         } catch (IOException e) {
@@ -134,28 +121,28 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
+        if (mHolder.getSurface() == null){
+            // preview surface does not exist
+            return;
+        }
+
+        // stop preview before making changes
         try {
-//            Camera.Parameters parameters = mCamera.getParameters();
-//            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-//                parameters.set("orientation", "portrait");
-//                mCamera.setDisplayOrientation(90);
-//                parameters.setRotation(90);
-//                mCamera.setPreviewDisplay(holder);
-//                mCamera.startPreview();
-//            }
-//            else {
-//                // This is an undocumented although widely known feature
-//                parameters.set("orientation", "landscape");
-//                // For Android 2.2 and above
-//                mCamera.setDisplayOrientation(0);
-//                // Uncomment for Android 2.0 and above
-//                parameters.setRotation(0);
-//            }
-            mCamera.setPreviewDisplay(holder);
+            mCamera.stopPreview();
+        } catch (Exception e){
+            // ignore: tried to stop a non-existent preview
+        }
+
+        // set preview size and make any resize, rotate or
+        // reformatting changes here
+
+        // start preview with new settings
+        try {
+            mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
-        } catch (IOException e) {
-            // left blank for now
+        } catch (Exception e){
+            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
 }
