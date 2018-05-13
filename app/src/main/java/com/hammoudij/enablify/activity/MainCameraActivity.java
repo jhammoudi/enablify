@@ -1,6 +1,7 @@
 package com.hammoudij.enablify.activity;
 
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class MainCameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_camera);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.CAMERA},
@@ -58,7 +60,7 @@ public class MainCameraActivity extends AppCompatActivity {
     private Camera.PictureCallback getPictureCallback() {
         Camera.PictureCallback picture = new Camera.PictureCallback() {
 
-            public static final String TAG = "MainCameraActivity" ;
+            private static final String TAG = "MainCameraActivity" ;
 
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -66,6 +68,7 @@ public class MainCameraActivity extends AppCompatActivity {
                 File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
 
                 if (pictureFile == null) {
+                    Log.d(TAG, "Error creating media file, check storage permissions");
                     return;
                 }
                 try {

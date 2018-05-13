@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainCameraActivity">
+    tools:context=".activity.MainCameraActivity"
+    >
 
     <FrameLayout
         android:id="@+id/camera_preview"
@@ -25,17 +26,19 @@
             android:layout_height="80dp"
             android:id="@+id/capture_btn"
             android:background="@drawable/round_capture_button"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:layout_marginBottom="-25dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:fitsSystemWindows="true">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:gravity="left"
+                android:gravity="start"
                 android:layout_weight="1">
                 <Button
                     android:layout_width="50dp"
@@ -48,7 +51,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:gravity="right"
+                android:gravity="end"
                 android:layout_weight="1">
                 <Button
                     android:layout_width="50dp"

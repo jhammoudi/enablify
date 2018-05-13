@@ -5,15 +5,19 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+import java.util.List;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview";
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private float mDist = 0;
+
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -26,24 +30,94 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // Get the pointer ID
+        Camera.Parameters params = mCamera.getParameters();
+        int action = event.getAction();
+
+        if (event.getPointerCount() > 1) {
+            // handle multi-touch events
+            if (action == MotionEvent.ACTION_POINTER_DOWN) {
+                mDist = getFingerSpacing(event);
+            } else if (action == MotionEvent.ACTION_MOVE
+                    && params.isZoomSupported()) {
+                mCamera.cancelAutoFocus();
+                handleZoom(event, params);
+            }
+        } else {
+            // handle single touch events
+            if (action == MotionEvent.ACTION_UP) {
+                handleFocus(event, params);
+            }
+        }
+        return true;
+    }
+
+    private void handleZoom(MotionEvent event, Camera.Parameters params) {
+        int maxZoom = params.getMaxZoom();
+        int zoom = params.getZoom();
+        float newDist = getFingerSpacing(event);
+        if (newDist > mDist) {
+            // zoom in
+            if (zoom < maxZoom)
+                zoom++;
+        } else if (newDist < mDist) {
+            // zoom out
+            if (zoom > 0)
+                zoom--;
+        }
+        mDist = newDist;
+        params.setZoom(zoom);
+        mCamera.setParameters(params);
+    }
+
+    public void handleFocus(MotionEvent event, Camera.Parameters params) {
+        int pointerId = event.getPointerId(0);
+        int pointerIndex = event.findPointerIndex(pointerId);
+        // Get the pointer's current position
+        float x = event.getX(pointerIndex);
+        float y = event.getY(pointerIndex);
+
+        List<String> supportedFocusModes = params.getSupportedFocusModes();
+        if (supportedFocusModes != null
+                && supportedFocusModes
+                .contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean b, Camera camera) {
+                    // currently set to auto-focus on single touch
+                }
+            });
+        }
+    }
+
+    /** Determine the space between the first two fingers */
+    private float getFingerSpacing(MotionEvent event) {
+        // ...
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float)Math.sqrt(x * x + y * y);
+    }
+
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
-
-            Camera.Parameters parameters = mCamera.getParameters();
-            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-                parameters.set("orientation", "portrait");
-                mCamera.setDisplayOrientation(90);
-                parameters.setRotation(90);
-            }
-            else {
-                // This is an undocumented although widely known feature
-                parameters.set("orientation", "landscape");
-                // For Android 2.2 and above
-                mCamera.setDisplayOrientation(0);
-                // Uncomment for Android 2.0 and above
-                parameters.setRotation(0);
-            }
+            mCamera.setDisplayOrientation(90);
+//            Camera.Parameters parameters = mCamera.getParameters();
+//            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+//                parameters.set("orientation", "portrait");
+//                mCamera.setDisplayOrientation(90);
+//                parameters.setRotation(90);
+//            }
+//            else {
+//                // This is an undocumented although widely known feature
+//                parameters.set("orientation", "landscape");
+//                // For Android 2.2 and above
+//                mCamera.setDisplayOrientation(0);
+//                // Uncomment for Android 2.0 and above
+//                parameters.setRotation(0);
+//            }
 
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
@@ -61,22 +135,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // Make sure to stop the preview before resizing or reformatting it.
 
         try {
-            Camera.Parameters parameters = mCamera.getParameters();
-            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-                parameters.set("orientation", "portrait");
-                mCamera.setDisplayOrientation(90);
-                parameters.setRotation(90);
-                mCamera.setPreviewDisplay(holder);
-                mCamera.startPreview();
-            }
-            else {
-                // This is an undocumented although widely known feature
-                parameters.set("orientation", "landscape");
-                // For Android 2.2 and above
-                mCamera.setDisplayOrientation(0);
-                // Uncomment for Android 2.0 and above
-                parameters.setRotation(0);
-            }
+//            Camera.Parameters parameters = mCamera.getParameters();
+//            if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+//                parameters.set("orientation", "portrait");
+//                mCamera.setDisplayOrientation(90);
+//                parameters.setRotation(90);
+//                mCamera.setPreviewDisplay(holder);
+//                mCamera.startPreview();
+//            }
+//            else {
+//                // This is an undocumented although widely known feature
+//                parameters.set("orientation", "landscape");
+//                // For Android 2.2 and above
+//                mCamera.setDisplayOrientation(0);
+//                // Uncomment for Android 2.0 and above
+//                parameters.setRotation(0);
+//            }
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
 
