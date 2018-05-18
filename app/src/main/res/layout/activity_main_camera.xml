@@ -13,7 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:id="@+id/camera_buttons"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -80,14 +82,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
     </RelativeLayout>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/captured_image"
-        android:contentDescription="Camera Placeholder"
-        />
 
 </RelativeLayout>
