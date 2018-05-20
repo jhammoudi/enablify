@@ -10,16 +10,23 @@ public class Audio {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
-    @ColumnInfo(name = "audio_name")
-    private String mAudioName;
+    @ColumnInfo(name = "name")
+    private String mName;
 
-    @ColumnInfo(name = "category")
-    private String mCategory;
+    @ColumnInfo(name = "length")
+    private String mLength;
 
+    @ColumnInfo(name = "time")
+    private String mTime;
 
-    public Audio( String audioName, String category) {
-        this.mAudioName = audioName;
-        this.mCategory = category;
+    @ColumnInfo(name = "file_path")
+    private String mFilePath;
+
+    public Audio(String name, String length, String time, String filePath) {
+        this.mName = name;
+        this.mLength = length;
+        this.mTime = time;
+        this.mFilePath = filePath;
     }
 
     public int getId() {
@@ -30,19 +37,35 @@ public class Audio {
         this.id = id;
     }
 
-    public String getAudioName() {
-        return mAudioName;
+    public String getName() {
+        return mName;
     }
 
-    public void setAudioName(String audioName) {
-        this.mAudioName = audioName;
+    public void setName(String mName) {
+        this.mName = mName;
     }
 
-    public String getCategory() {
-        return mCategory;
+    public String getLength() {
+        return mLength;
     }
 
-    public void setCategory(String category) {
-        this.mCategory = category;
+    public void setLength(String length) {
+        this.mLength = length;
+    }
+
+    public String getTime() {
+        return mTime;
+    }
+
+    public void setTime(String time) {
+        this.mTime = time;
+    }
+
+    public String getFilePath() {
+        return mFilePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.mFilePath = filePath;
     }
 }
