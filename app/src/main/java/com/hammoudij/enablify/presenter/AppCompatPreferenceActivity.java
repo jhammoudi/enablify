@@ -1,4 +1,4 @@
-package com.hammoudij.enablify;
+package com.hammoudij.enablify.presenter;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

@@ -29,6 +29,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:support-annotations:27.1.1'
 
     //APIs:
 
@@ -43,4 +44,19 @@ dependencies {
     def room_version = "1.1.0" // or, for latest rc, use "1.1.1-rc1"
     implementation "android.arch.persistence.room:runtime:$room_version"
     annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+
+    /*Firebase - ML Kit (Text Recognition)*/
+    implementation 'com.google.firebase:firebase-core:16.0.0'
+    implementation 'com.google.firebase:firebase-ml-vision:16.0.0'
+
+    // Retrofit - Android HTTP Client
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+
+    // GSON - A Java Serialization/Deserialization Library
+    compile 'com.google.code.gson:gson:2.6.2'
+
+    // Camera1 - Captures Images
 }
+
+apply plugin: 'com.google.gms.google-services'

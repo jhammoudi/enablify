@@ -2,7 +2,6 @@ package com.hammoudij.enablify.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -19,7 +18,7 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import com.hammoudij.enablify.AppCompatPreferenceActivity;
+import com.hammoudij.enablify.presenter.AppCompatPreferenceActivity;
 import com.hammoudij.enablify.R;
 
 import java.util.List;

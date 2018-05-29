@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "472948491766",
+    "firebase_url": "https://zinc-primer-173507.firebaseio.com",
+    "project_id": "zinc-primer-173507",
+    "storage_bucket": "zinc-primer-173507.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472948491766:android:092d6eba6c4015df",
+        "android_client_info": {
+          "package_name": "com.hammoudij.enablify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472948491766-jh4hg3jd7bu2pp8np5voiu2n0itddmqq.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "472948491766-jh4hg3jd7bu2pp8np5voiu2n0itddmqq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDk1UII9XcQdCV-oMoNQ3ERsgQfs778afE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

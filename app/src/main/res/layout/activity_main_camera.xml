@@ -13,75 +13,133 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:layout_margin="10dp"
-        android:id="@+id/camera_buttons"
-        android:visibility="visible">
+        android:layout_margin="10dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true">
-
-            <ToggleButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/toggle_flash"
-                android:background="@drawable/flash_toggle"
-                android:textOn=""
-                android:textOff=""/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:id="@+id/capture_btn"
-                android:background="@drawable/round_capture_button"
-                android:layout_gravity="center"
-                android:layout_marginBottom="-25dp"/>
+            android:layout_height="match_parent"
+            android:id="@+id/camera_buttons"
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:gravity="start"
-                    android:layout_weight="1">
-                    <Button
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:id="@+id/settings_btn"
-                        android:background="@drawable/ic_settings"
-                        android:gravity="start"
-                        />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:gravity="end"
-                    android:layout_weight="1">
-                    <Button
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:id="@+id/audio_list_btn"
-                        android:background="@drawable/ic_list"
-                        android:gravity="end"
-                        />
-                </LinearLayout>
+                <ToggleButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/toggle_flash"
+                    android:background="@drawable/flash_toggle"
+                    android:textOn=""
+                    android:textOff=""/>
+
             </LinearLayout>
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <Button
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:id="@+id/capture_btn"
+                    android:background="@drawable/round_capture_button"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="-25dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="start"
+                        android:layout_weight="1">
+                        <Button
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/settings_btn"
+                            android:background="@drawable/ic_settings"
+                            android:gravity="start"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end"
+                        android:layout_weight="1">
+                        <Button
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/audio_list_btn"
+                            android:background="@drawable/ic_list"
+                            android:gravity="end"
+                            />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/verify_image_buttons"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="start"
+                        android:layout_weight="1">
+                        <Button
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/cancel_image_btn"
+                            android:background="@drawable/ic_cancel"
+                            android:gravity="start"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="end"
+                        android:layout_weight="1">
+                        <Button
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/confirm_image_btn"
+                            android:background="@drawable/ic_confirm"
+                            android:gravity="end"
+                            />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
     </RelativeLayout>
 
 </RelativeLayout>
