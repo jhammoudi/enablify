@@ -15,6 +15,10 @@ public class RetrofitModel {
     @Expose
     private List<Voice> voices = null;
 
+    @SerializedName("voice")
+    @Expose
+    private Voice voice;
+
     @SerializedName("audioConfig")
     @Expose
     private AudioConfig audioConfig;
@@ -29,6 +33,14 @@ public class RetrofitModel {
 
     public void setVoices(List<Voice> voices) {
         this.voices = voices;
+    }
+
+    public Voice getVoice() {
+        return voice;
+    }
+
+    public void setVoice(Voice voice) {
+        this.voice = voice;
     }
 
     public Input getInput() {

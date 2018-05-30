@@ -1,7 +1,9 @@
 package com.hammoudij.enablify.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +26,7 @@ import com.hammoudij.enablify.model.Input;
 import com.hammoudij.enablify.model.Voice;
 import com.hammoudij.enablify.model.RetrofitModel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +41,6 @@ import static com.hammoudij.enablify.activity.MainCameraActivity.FIREBASE_TEXT;
 
 public class CreateAudioActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    public static final String LANGUAGE_ONLY_FIELD = "voices%2FlanguageCodes";
-    public static final String VOICE_TYPE_ONLY_FIELD = "voices%2Fname";
-
     @BindView(R.id.audio_name)
     public EditText mAudioNameEditTxt;
 
@@ -51,6 +52,9 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
 
     @BindView(R.id.voice_type_spinner)
     public Spinner mVoiceTypeSpinner;
+
+    @BindView(R.id.create_audio_btn )
+    public Button mCreateAudioBtn;
 
     private List<String> mListOfLanguageCodes = new ArrayList<>();
     private List<String> mListOfVoiceTypes = new ArrayList<>();
@@ -79,6 +83,8 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         retrieveLanguageCodes();
         mLanguageCodeSpinner.setOnItemSelectedListener(this);
         mVoiceTypeSpinner.setEnabled(false);
+        mLanguageCodeSpinner.setEnabled(false);
+        mCreateAudioBtn.setEnabled(false);
     }
 
     private void retrieveLanguageCodes() {
@@ -100,6 +106,7 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
 
                 mLanguageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mLanguageCodeSpinner.setAdapter(mLanguageSpinnerAdapter); // this will set list of values to spinner
+                mLanguageCodeSpinner.setEnabled(true);
             }
 
             @Override
@@ -128,11 +135,9 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         input.setText(intent.getStringExtra(FIREBASE_TEXT));
 
         Voice voice = new Voice();
-
-        List<String> temp = new ArrayList<>();
-        temp.add(mLanguageCodeSpinner.getSelectedItem().toString());
-        voice.setLanguageCodes(temp);
+        voice.setLanguageCode(mLanguageCodeSpinner.getSelectedItem().toString());
         voice.setName(mVoiceTypeSpinner.getSelectedItem().toString());
+
         AudioConfig audioConfig = new AudioConfig();
         audioConfig.setAudioEncoding("MP3");
 
@@ -187,6 +192,7 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            mCreateAudioBtn.setEnabled(true);
         }
 
         @Override
@@ -250,14 +256,22 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         @Override
         protected Void doInBackground(Void... voids) {
 
-            Call<RetrofitModel> call = apiService.synthesizeText(input,voice,audioConfig,API_KEY);
+            RetrofitModel retrofitModel = new RetrofitModel();
+            retrofitModel.setInput(input);
+            retrofitModel.setVoice(voice);
+            retrofitModel.setAudioConfig(audioConfig);
+
+            Call<RetrofitModel> call = apiService.synthesizeText(retrofitModel,API_KEY);
             call.enqueue(new Callback<RetrofitModel>() {
                 @Override
                 public void onResponse(Call<RetrofitModel>call, Response<RetrofitModel> response) {
 
                     //Base64-Encoded Audio Content
                     String audioContent = response.body().getAudioContent();
-                    Log.e("RESULT", audioContent);
+                    Log.d("RESULT", audioContent);
+
+                    Toast.makeText(CreateAudioActivity.this, audioContent, Toast.LENGTH_LONG).show();
+
                 }
 
                 @Override

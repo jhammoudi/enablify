@@ -1,5 +1,8 @@
 package com.hammoudij.enablify.activity;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +12,7 @@ import android.widget.TextView;
 import com.hammoudij.enablify.R;
 import com.hammoudij.enablify.model.Audio;
 
+import java.io.File;
 import java.util.List;
 
 class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
@@ -49,6 +53,12 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
         public TextView name;
         public TextView length;
         public TextView time;
+
+//        File musicFile2Play = new File(Environment.getExternalStorageDirectory().getPath()+"some_file.mp3");
+//        Intent i2 = new Intent();
+//                    i2.setAction(android.content.Intent.ACTION_VIEW);
+//                    i2.setDataAndType(Uri.fromFile(musicFile2Play), "audio/mp3");
+//        startActivity(i2);
 
         public ViewHolder(View itemView, List<Audio> mAudioList) {
             super(itemView);

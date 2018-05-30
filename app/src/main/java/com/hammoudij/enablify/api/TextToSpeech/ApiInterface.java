@@ -6,8 +6,10 @@ import com.hammoudij.enablify.model.RetrofitModel;
 import com.hammoudij.enablify.model.Voice;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -21,9 +23,17 @@ public interface ApiInterface {
             @Query("languageCode") String languageCode,
             @Query("key") String apiKey);
 
-    @POST("text:synthesize")
-    Call<RetrofitModel> synthesizeText(@Field("input") Input input,
-                                       @Field("voice") Voice voice,
-                                       @Field("audioConfig") AudioConfig audioConfig,
-                                       @Field("key") String apiKey);
+//    @Headers("Content-Type: application/json")
+//    @POST("./text:synthesize")
+//    Call<RetrofitModel> synthesizeText(
+//            @Query("input") Input input,
+//            @Query("voice") Voice voice,
+//            @Query("audioConfig") AudioConfig audioConfig,
+//            @Query("key") String apiKey);
+
+    @Headers("Content-Type: application/json")
+    @POST("./text:synthesize")
+    Call<RetrofitModel> synthesizeText(
+            @Body RetrofitModel retrofitModel,
+            @Query("key") String apiKey);
 }

@@ -10,6 +10,11 @@ public class Voice {
     @SerializedName("languageCodes")
     @Expose
     private List<String> languageCodes = null;
+
+    @SerializedName("languageCode")
+    @Expose
+    private String languageCode;
+
     @SerializedName("name")
     @Expose
     private String name;
@@ -26,6 +31,14 @@ public class Voice {
 
     public void setLanguageCodes(List<String> languageCodes) {
         this.languageCodes = languageCodes;
+    }
+
+    public String getLanguageCode() {
+        return languageCode;
+    }
+
+    public void setLanguageCode(String languageCode) {
+        this.languageCode = languageCode;
     }
 
     public String getName() {
