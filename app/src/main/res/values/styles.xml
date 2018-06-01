@@ -20,4 +20,8 @@
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
+    <style name="splashScreenTheme" parent="CameraTheme">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
 </resources>

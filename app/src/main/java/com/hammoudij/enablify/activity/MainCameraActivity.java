@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
-public class MainCameraActivity extends AppCompatActivity implements MainMVP.EnablifyView{
+public class MainCameraActivity extends AppCompatActivity implements MainMVP.EnablifyView {
 
     public static final String FIREBASE_TEXT = "Firebase";
     private Camera mCamera;
@@ -62,6 +62,7 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_camera);
+        setTheme(R.style.splashScreenTheme);
         setupMVP();
         askCameraPermissions();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -74,7 +75,7 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
 
     @OnCheckedChanged(R.id.toggle_flash)
     public void onToggleFlashClicked(boolean checked) {
-        mPresenter.onToggleFlashClicked(checked,mCamera);
+        mPresenter.onToggleFlashClicked(checked, mCamera);
     }
 
     @OnClick(R.id.capture_btn)
@@ -93,9 +94,7 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
 
     @OnClick(R.id.confirm_image_btn)
     public void onConfirmImageBtnClick() {
-        mPresenter.runTextRecognition(this,CreateAudioActivity.class,1);
-        mMainCameraButtons.setVisibility(View.VISIBLE);
-        mVerifyImageButtons.setVisibility(View.INVISIBLE);
+        mPresenter.runTextRecognition(this, CreateAudioActivity.class);
     }
 
     @OnClick(R.id.settings_btn)
@@ -105,12 +104,8 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
 
     @OnClick(R.id.audio_list_btn)
     public void onAudioListBtnClick() {
-        mPresenter.startIntent(this, AudioListActivity.class ,3);
+        mPresenter.startIntent(this, AudioListActivity.class, 3);
     }
-
-//    private void askCameraPermissions() {
-//        mPresenter.askCameraPermissions(this);
-//    }
 
     public void askCameraPermissions() {
         Dexter.withActivity(this)
@@ -149,7 +144,7 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
         preview.addView(mPreview);
     }
 
-    public Camera checkDeviceCamera(){
+    public Camera checkDeviceCamera() {
         Camera camera = null;
         try {
             camera = Camera.open();
@@ -159,8 +154,8 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
         return camera;
     }
 
-    public void releaseCamera(){
-        if (mCamera != null){
+    public void releaseCamera() {
+        if (mCamera != null) {
             mCamera.release();
             // release the camera for other applications
             mPreview.getHolder().removeCallback(mPreview);
@@ -178,12 +173,11 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
     protected void onResume() {
         super.onResume();
 
+        mMainCameraButtons.setVisibility(View.VISIBLE);
+        mVerifyImageButtons.setVisibility(View.INVISIBLE);
+
         if (mCamera == null) {
             connectCamera();
         }
     }
-
-
-
-
 }

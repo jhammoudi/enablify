@@ -11,12 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:id="@+id/audio_customise_layout">
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/audio_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:hintTextAppearance="@style/AudioHintText">
+            app:hintTextAppearance="@style/AudioHintText"
+            >
 
             <android.support.design.widget.TextInputEditText
                 android:layout_width="match_parent"
@@ -32,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:baselineAligned="false"
             android:paddingTop="15dp">
 
 
@@ -39,7 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:gravity="center">
 
 
@@ -60,7 +65,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_weight="1"
+                android:layout_weight="3"
                 android:gravity="center">
 
 
@@ -93,29 +98,26 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="10dp">
+                    android:layout_gravity="start"
+                    android:padding="5dp"
+                    android:hint="Speed:"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="Speed:"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:gravity="end"
-                        android:layout_height="wrap_content"
-                        android:hint="1.00"/>
-
-                </LinearLayout>
-
-                <SeekBar
+                <com.warkiz.widget.IndicatorSeekBar
                     android:layout_width="match_parent"
+                    android:id="@+id/speed_seek_bar"
                     android:layout_height="wrap_content"
-                    android:max="4"/>
+                    app:isb_max="4"
+                    app:isb_progress="1"
+                    app:isb_thumb_color="@color/colorAccent"
+                    app:isb_track_progress_bar_color="@color/colorAccent"
+                    app:isb_progress_value_float="true"
+                    app:isb_text_color="@color/colorAccent"
+                    app:isb_thumb_progress_stay="true"
+                    app:isb_indicator_color="@color/colorAccent"
+                    app:isb_min="0.25"/>
 
             </LinearLayout>
 
@@ -126,29 +128,26 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="10dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:padding="5dp"
                         android:hint="Pitch:"/>
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:gravity="end"
-                        android:layout_height="wrap_content"
-                        android:hint="0.00"/>
-
-                </LinearLayout>
-
-                <SeekBar
+                <com.warkiz.widget.IndicatorSeekBar
                     android:layout_width="match_parent"
-                    android:max="20"
-                    android:layout_height="wrap_content"/>
+                    android:id="@+id/pitch_seek_bar"
+                    android:layout_height="wrap_content"
+                    app:isb_max="20"
+                    app:isb_progress="0"
+                    app:isb_thumb_color="@color/colorAccent"
+                    app:isb_thumb_progress_stay="true"
+                    app:isb_indicator_color="@color/colorAccent"
+                    app:isb_text_color="@color/colorAccent"
+                    app:isb_progress_value_float="true"
+                    app:isb_track_progress_bar_color="@color/colorAccent"
+                    app:isb_min="-20"/>
 
             </LinearLayout>
 
@@ -190,12 +189,17 @@
         android:id="@+id/create_button_layout"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:id="@+id/create_audio_btn"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
+            android:background="@drawable/round_capture_button"
+            android:textColor="@color/colorAccent"
             android:text="Create Audio"/>
 
     </LinearLayout>

@@ -2,6 +2,7 @@ package com.hammoudij.enablify.presenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,9 +30,6 @@ import static com.hammoudij.enablify.activity.MainCameraActivity.FIREBASE_TEXT;
 
 public class CameraPresenter implements MainMVP.CameraPresenter {
 
-    private static final String TAG = "Error";
-    private Bitmap mCameraBitmap;
-
     public void onToggleFlashClicked(boolean checked, Camera camera) {
 
         if (checked) {
@@ -49,12 +47,12 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
     }
 
     public void onCaptureBtnClick(Camera camera, Activity activity) {
-        camera.takePicture(null,null, getPictureCallback(activity));
+        camera.takePicture(null, null, getPictureCallback(activity));
     }
 
     public void startIntent(Activity activity, Class c, int requestCode) {
         Intent intent = new Intent(activity, c);
-        activity.startActivityForResult(intent,requestCode);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     public void showSettingsDialog(final Activity activity) {
@@ -89,7 +87,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
 
-                Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data , 0, data.length);
+                Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 createImageFromBitmap(cameraBitmap, activity);
             }
         };
@@ -113,49 +111,83 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
     }
 
 
-    public void runTextRecognition(final Activity activity, final Class c, final int requestCode) {
+    private class TextRecognitionAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        Bitmap test = null;
-        try {
-            test = BitmapFactory.decodeStream(activity.openFileInput("tempImage"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        Activity activity;
+        Class c;
+        ProgressDialog dialog;
+        Intent intent;
+
+        public TextRecognitionAsyncTask(Activity activity, Class c) {
+            this.activity = activity;
+            this.dialog = new ProgressDialog(activity);
+            this.c = c;
+            this.intent = new Intent(activity, c);
         }
 
-        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(test);
-        FirebaseVisionTextDetector detector = FirebaseVision.getInstance()
-                .getVisionTextDetector();
-        detector.detectInImage(image)
-                .addOnSuccessListener(
-                        new OnSuccessListener<FirebaseVisionText>() {
-                            @Override
-                            public void onSuccess(FirebaseVisionText texts) {
-                                processTextRecognitionResult(activity, c, requestCode, texts);
-                            }
-                        })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                // Task failed with an exception
-                                e.printStackTrace();
-                            }
-                        });
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Extracting text from Image");
+            dialog.show();
+        }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Bitmap test = null;
+            try {
+                test = BitmapFactory.decodeStream(activity.openFileInput("tempImage"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(test);
+            FirebaseVisionTextDetector detector = FirebaseVision.getInstance()
+                    .getVisionTextDetector();
+            detector.detectInImage(image)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<FirebaseVisionText>() {
+                                @Override
+                                public void onSuccess(FirebaseVisionText texts) {
+                                    intent.putExtra(FIREBASE_TEXT, getTextFromFireBase(texts));
+                                    startIntent();
+                                }
+                            })
+                    .addOnFailureListener(
+                            new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    // Task failed with an exception
+                                    e.printStackTrace();
+                                }
+                            });
+            return null;
+        }
+
+        private void startIntent() {
+            activity.startActivity(intent);
+        }
     }
 
-    public void processTextRecognitionResult(Activity activity, Class c, int requestCode,FirebaseVisionText texts) {
-        Intent intent = new Intent(activity, c);
-        intent.putExtra(FIREBASE_TEXT, getTextFromFireBase(texts));
-        activity.startActivityForResult(intent,requestCode);
+    public void runTextRecognition(Activity activity, Class c) {
+        new TextRecognitionAsyncTask(activity, c).execute();
     }
 
     public String getTextFromFireBase(FirebaseVisionText texts) {
 
         StringBuilder s = new StringBuilder();
 
-        for (FirebaseVisionText.Block block: texts.getBlocks()) {
-            for (FirebaseVisionText.Line line: block.getLines()) {
+        for (FirebaseVisionText.Block block : texts.getBlocks()) {
+            for (FirebaseVisionText.Line line : block.getLines()) {
                 String text = line.getText();
                 s.append(text);
             }

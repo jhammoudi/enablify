@@ -1,6 +1,7 @@
 package com.hammoudij.enablify;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 
@@ -21,8 +22,7 @@ public interface MainMVP {
 //        void onResume(Activity activity, Camera camera);
 //        void releaseCamera(Camera camera, CameraPreview cameraPreview);
         Camera.PictureCallback getPictureCallback(final Activity activity);
-        void runTextRecognition(final Activity activity, final Class c, final int requestCode);
-        void processTextRecognitionResult(Activity activity, Class c, int requestCode,FirebaseVisionText texts);
+        void runTextRecognition(Activity activity,Class c);
         String getTextFromFireBase(FirebaseVisionText texts);
     }
 

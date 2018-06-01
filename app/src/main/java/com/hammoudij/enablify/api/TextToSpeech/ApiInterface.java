@@ -23,14 +23,6 @@ public interface ApiInterface {
             @Query("languageCode") String languageCode,
             @Query("key") String apiKey);
 
-//    @Headers("Content-Type: application/json")
-//    @POST("./text:synthesize")
-//    Call<RetrofitModel> synthesizeText(
-//            @Query("input") Input input,
-//            @Query("voice") Voice voice,
-//            @Query("audioConfig") AudioConfig audioConfig,
-//            @Query("key") String apiKey);
-
     @Headers("Content-Type: application/json")
     @POST("./text:synthesize")
     Call<RetrofitModel> synthesizeText(

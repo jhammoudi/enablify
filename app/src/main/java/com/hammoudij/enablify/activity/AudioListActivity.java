@@ -39,13 +39,10 @@ public class AudioListActivity extends AppCompatActivity {
 
         AppDatabase db = AppDatabase.getDatabase(this);
 
-//        db.audioDao().deleteAll();
-
         audioList = db.audioDao().getAllAudio();
-        mAudioAdapter = new AudioAdapter(audioList);
+        mAudioAdapter = new AudioAdapter(audioList, db);
         mRecyclerView.setAdapter(mAudioAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
     }
 
