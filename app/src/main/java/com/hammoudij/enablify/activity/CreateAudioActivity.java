@@ -3,6 +3,7 @@ package com.hammoudij.enablify.activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -96,7 +97,6 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
 
         intent = getIntent();
 
-        Log.d(getLocalClassName(), "new activity started");
         mImageText.setText(intent.getStringExtra(FIREBASE_TEXT));
 
         new GetLanguageCodeAsyncTask().execute();
@@ -329,14 +329,15 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
                     Log.d("RESULT-DECODE", audioAsBytes.toString());
 
 
-                    File root = android.os.Environment.getExternalStorageDirectory();
-                    File file = new File(root.getAbsolutePath() + "/Enablify/Audios");
+                    File root = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                    //File root = Environment.getExternalStorageDirectory();
+                    File folder = new File(root.getAbsoluteFile(),"Enablify");
 
-                    if (!file.exists()) {
-                        file.mkdirs();
+                    if (!folder.exists()) {
+                        folder.mkdirs();
                     }
 
-                    String fileName = root.getAbsolutePath() + "/Enablify/Audios/" +
+                    String fileName = folder.getAbsolutePath()  + "/"+
                             String.valueOf(System.currentTimeMillis() + ".mp3");
 
 
@@ -350,7 +351,7 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
 
                     Log.d("RESULT-FILEPATH", fileName);
 
-                    String filePath = "http://techslides.com/demos/samples/sample.mp3";
+                    //String filePath = "http://techslides.com/demos/samples/sample.mp3";
 
                     mAudioName = mAudioNameEditTxt.getText().toString();
 
@@ -358,10 +359,12 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
 
                     String durationStr = "00:00";
 
-                    Audio audio = new Audio(mAudioName, durationStr, dateTime, filePath);
+                    Audio audio = new Audio(mAudioName, durationStr, dateTime, fileName);
 
                     db.audioDao().insertAll(audio);
                     Intent i = new Intent(getApplicationContext(), AudioListActivity.class);
+                    i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    i.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     finish();
                     startActivity(i);
                 }

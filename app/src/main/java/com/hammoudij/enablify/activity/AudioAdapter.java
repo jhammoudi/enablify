@@ -2,6 +2,7 @@ package com.hammoudij.enablify.activity;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.hammoudij.enablify.R;
 import com.hammoudij.enablify.db.AppDatabase;
 import com.hammoudij.enablify.model.Audio;
 
+import java.io.File;
 import java.util.List;
 
 class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
@@ -55,14 +57,17 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
         notifyItemRemoved(position);
     }
 
-    private void shareItem(View view, int position) {
+    private void shareItem(View v, int position) {
 
         Audio audio = mAudioList.get(position);
         String filePath = audio.getFilePath();
+        File file = new File(filePath);
+        Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + ".fileprovider",file);
         Intent share = new Intent(Intent.ACTION_SEND);
+        share.putExtra(Intent.EXTRA_STREAM, audioUri);
         share.setType("audio/mp3");
-        share.putExtra(Intent.EXTRA_STREAM, filePath);
-        view.getContext().startActivity(Intent.createChooser(share, "Share Audio File"));
+        share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        v.getContext().startActivity(Intent.createChooser(share, "Share Audio File"));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, View.OnCreateContextMenuListener {
@@ -89,13 +94,14 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
             Audio audio = mAudioList.get(position);
             String filePath = audio.getFilePath();
 
-            Intent intent = new Intent(Intent.ACTION_VIEW);
+            File audioFile = new File(filePath);
 
-            Uri audioUri = Uri.parse(filePath);
-            intent.setDataAndType(audioUri,
-                    "audio/mp3");
+            Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + ".fileprovider",audioFile);
 
-            v.getContext().startActivity(intent);
+            Intent play = new Intent(Intent.ACTION_VIEW);
+            play.setDataAndType(audioUri,"audio/mp3");
+            play.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            v.getContext().startActivity(play);
         }
 
         @Override
