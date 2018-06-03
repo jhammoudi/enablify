@@ -19,6 +19,11 @@ package com.hammoudij.enablify.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The Input model class containing all elements of an Input for the Google Cloud API
+ * This model is used for the Google Text-to-speech API, where it determines the text input needed to convert to speech
+ */
+
 public class Input {
 
     @SerializedName("text")

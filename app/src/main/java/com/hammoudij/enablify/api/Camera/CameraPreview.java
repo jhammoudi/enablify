@@ -17,26 +17,26 @@
 package com.hammoudij.enablify.api.Camera;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.hardware.Camera;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.FrameLayout;
-
-import com.hammoudij.enablify.R;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Camera Preview class that handles interactions with the Camera and surface preview
+ */
+
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private static final String TAG = "CameraPreview";
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private float mDist = 0;
 
-
+    /**
+     * Camera Preview constructor
+     */
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
@@ -48,6 +48,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Handles the pinch to zoom feature with the Camera preview
+     * Handles the touch to focus feature with the Camera preview
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // Get the pointer ID
@@ -61,39 +67,50 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             } else if (action == MotionEvent.ACTION_MOVE
                     && params.isZoomSupported()) {
                 mCamera.cancelAutoFocus();
+
+                //handle the zoom of camera according to finger spacing distance
+                //this method gets called continuously as the screen is touched
                 handleZoom(event, params);
             }
         } else {
             // handle single touch events
             if (action == MotionEvent.ACTION_UP) {
+                //focus with single touch
                 handleFocus(event, params);
             }
         }
         return true;
     }
 
+    /**
+     * Handles the pinch to zoom feature of camera
+     */
     private void handleZoom(MotionEvent event, Camera.Parameters params) {
         int maxZoom = params.getMaxZoom();
         int zoom = params.getZoom();
         float newDist = getFingerSpacing(event);
         if (newDist > mDist) {
-            // zoom in
+            //handles zoom in
             if (zoom < maxZoom)
                 zoom++;
         } else if (newDist < mDist) {
-            // zoom out
+            //handles zoom out
             if (zoom > 0)
                 zoom--;
         }
         mDist = newDist;
+        //set the new zoom to the camera parameter
         params.setZoom(zoom);
         mCamera.setParameters(params);
     }
 
+    /**
+     * Handles the touch to focus feature of the camera
+     */
     public void handleFocus(MotionEvent event, Camera.Parameters params) {
         int pointerId = event.getPointerId(0);
         int pointerIndex = event.findPointerIndex(pointerId);
-        // Get the pointer's current position
+        // calculates the current position of pointer
         float x = event.getX(pointerIndex);
         float y = event.getY(pointerIndex);
 
@@ -110,14 +127,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    /** Determine the space between the first two fingers */
+    /**
+     * Determines the distance between the two fingers
+     */
     private float getFingerSpacing(MotionEvent event) {
         // ...
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
-        return (float)Math.sqrt(x * x + y * y);
+        return (float) Math.sqrt(x * x + y * y);
     }
 
+    /**
+     * Method called when surface gets created
+     * Similar to onCreate method in an Activity class
+     */
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
@@ -130,37 +153,41 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    /**
+     * Method called when surface gets destroyed
+     * Similar to onDestroy method in an Activity class
+     */
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
+        // empty. Took care of releasing the Camera preview in your activity and presenter.
     }
 
+    /**
+     * Method called when surface gets changed
+     * Similar to onResume method in an Activity class where it will be called on screen rotation etc
+     */
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        // If your preview can change or rotate, take care of those events here.
-        // Make sure to stop the preview before resizing or reformatting it.
 
-        if (mHolder.getSurface() == null){
-            // preview surface does not exist
+        // preview surface does not exist
+        if (mHolder.getSurface() == null) {
+            //then don't do anything
             return;
         }
 
-        // stop preview before making changes
+        // stop preview before making changes, as it can not be changed while previewing
         try {
             mCamera.stopPreview();
-        } catch (Exception e){
+        } catch (Exception e) {
             //There are no specific exceptions to handle when opening the Camera
             //however want to catch all kinds of errors that may occur, as it is appropriate
             // ignore: tried to stop a non-existent preview
         }
 
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
-
-        // start preview with new settings
+        //set the preview of the camera
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             //There are no specific exceptions to handle when opening the Camera
             //however want to catch all kinds of errors that may occur, as it is appropriate
             e.printStackTrace();

@@ -17,7 +17,6 @@
 package com.hammoudij.enablify.activity;
 
 import android.Manifest;
-import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +41,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+
+/**
+ * The Main Camera Activity Class shows the Camera preview where users can capture images
+ */
 
 public class MainCameraActivity extends AppCompatActivity {
 
@@ -73,6 +76,9 @@ public class MainCameraActivity extends AppCompatActivity {
     @BindView(R.id.verify_image_buttons)
     RelativeLayout mVerifyImageButtons;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,15 +90,26 @@ public class MainCameraActivity extends AppCompatActivity {
         shouldExecuteOnResume = false;
     }
 
+    /**
+     * Sets up the MVP Architecture
+     */
     private void setupMVP() {
+        //Initialising the Presenter
         mPresenter = new CameraPresenter();
     }
 
+    /**
+     * Handles the toggle image is pressed, the camera flash mode toggles, called from the presenter
+     */
     @OnCheckedChanged(R.id.toggle_flash)
     public void onToggleFlashClicked(boolean checked) {
         mPresenter.onToggleFlashClicked(checked, mCamera);
     }
 
+    /**
+     * Handles the capture button click
+     * this will also show new buttons where users can either cancel or confirm the image
+     */
     @OnClick(R.id.capture_btn)
     public void onCaptureBtnClick() {
         mPresenter.onCaptureBtnClick(mCamera, this);
@@ -100,6 +117,9 @@ public class MainCameraActivity extends AppCompatActivity {
         mVerifyImageButtons.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Handles the cancel button which resumes the camera
+     */
     @OnClick(R.id.cancel_image_btn)
     public void onCancelImageBtnClick() {
         mMainCameraButtons.setVisibility(View.VISIBLE);
@@ -107,35 +127,53 @@ public class MainCameraActivity extends AppCompatActivity {
         mCamera.startPreview();
     }
 
+    /**
+     * handles the confirm button click which runs the text recognition and starts new activity
+     */
     @OnClick(R.id.confirm_image_btn)
     public void onConfirmImageBtnClick() {
         mPresenter.runTextRecognition(this, CreateAudioActivity.class);
     }
 
+    /**
+     * handles the audio list button click which starts new intent to the AudioListActivity
+     */
     @OnClick(R.id.audio_list_btn)
     public void onAudioListBtnClick() {
         mPresenter.startIntent(this, AudioListActivity.class);
     }
 
+    /**
+     * Handles the run-time permission for the Camera
+     */
     public void askCameraPermissions() {
         Dexter.withActivity(this)
                 .withPermission(Manifest.permission.CAMERA)
                 .withListener(new PermissionListener() {
 
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
+                        //if permission is granted, connect the camera
                         connectCamera();
-                        // permission is granted, open the camera
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
-                        // check for permanent denial of permission
+                        // if permission is not granted, show user a dialog asking user to accept permission to use application
                         if (response.isPermanentlyDenied()) {
                             mPresenter.showSettingsDialog(MainCameraActivity.this);
                         }
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
                         token.continuePermissionRequest();
@@ -143,16 +181,23 @@ public class MainCameraActivity extends AppCompatActivity {
                 }).check();
     }
 
+    /**
+     * Connects camera to the camera preview
+     */
     public void connectCamera() {
-        // Create an instance of Camera
+        // Create an instance of the Camera
         mCamera = mPresenter.checkDeviceCamera(this);
-        // Create our Preview view and set it as the content of our activity.
+        //set the orientation of the camera to portrait
         mCamera.setDisplayOrientation(PORTRAIT_ORIENTATION);
+        // Create a Preview view and set it as the context of our activity.
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
     }
 
+    /**
+     * This method is called to disconnect the Camera when not in use, to allow other applications to use it
+     */
     public void releaseCamera() {
         if (mCamera != null) {
             mCamera.release();
@@ -162,12 +207,19 @@ public class MainCameraActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onPause() {
         super.onPause();
+        //when onPause is called, disconnect camera to allow other applications to connect
         releaseCamera();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -175,11 +227,15 @@ public class MainCameraActivity extends AppCompatActivity {
         mMainCameraButtons.setVisibility(View.VISIBLE);
         mVerifyImageButtons.setVisibility(View.INVISIBLE);
 
-        if(shouldExecuteOnResume){
+        //this if statement is to ensure that the camera is not connected before permissions are given
+        // as onResume is called after onCreate, if permission are not given yet, the app will crash as it can not connect
+        //this ensures that when app is first opened, this method is not called
+        if (shouldExecuteOnResume) {
             if (mCamera == null) {
+                //reconnect the camera after onResume called as it is needed
                 connectCamera();
             }
-        } else{
+        } else {
             shouldExecuteOnResume = true;
         }
     }

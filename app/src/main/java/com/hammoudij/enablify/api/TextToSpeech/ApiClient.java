@@ -19,14 +19,20 @@ package com.hammoudij.enablify.api.TextToSpeech;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Api Client for the Google Cloud API - Text-to-speech
+ */
+
 public class ApiClient {
 
     public static final String BASE_URL = "https://texttospeech.googleapis.com/v1beta1/";
     private static Retrofit retrofit = null;
 
-
+    /**
+     * The Retrofit getClient method which builds the Retrofit model using the API URL.
+     */
     public static Retrofit getClient() {
-        if (retrofit==null) {
+        if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())

@@ -23,15 +23,22 @@ import android.content.Context;
 
 import com.hammoudij.enablify.model.Audio;
 
+/**
+ * The Application Database Class, using the Room Persistence API
+ */
+
 @Database(entities = {Audio.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final String DATABASE_NAME = "production";
+    private static final String DATABASE_NAME = "production";
 
     public abstract AudioDao audioDao();
 
     private static AppDatabase INSTANCE;
 
+    /**
+     * Instantiating the Application Database using the Singleton pattern
+     */
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {

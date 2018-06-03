@@ -23,21 +23,37 @@ import android.arch.persistence.room.Query;
 
 import com.hammoudij.enablify.model.Audio;
 
-import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * The Data Access Object used with the Application's Database.
+ * Handles database queries needed for the application
+ */
 
 @Dao
 public interface AudioDao {
 
+    /**
+     * Retrieves all Audio objects from the Database table
+     */
     @Query("SELECT * FROM audio_table")
     List<Audio> getAllAudio();
 
+    /**
+     * Inserts all parameter Audio objects in to the Database table
+     */
     @Insert
     void insertAll(Audio... audios);
 
+    /**
+     * Deletes all Audio objects in the Database table
+     */
     @Query("DELETE FROM audio_table")
     void deleteAll();
 
+    /**
+     * Deletes the Audio object by parameter, in the Database table
+     */
     @Delete
     void delete(Audio audio);
 }

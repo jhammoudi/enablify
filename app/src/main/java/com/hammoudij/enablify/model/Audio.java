@@ -20,6 +20,10 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+/**
+ * The Audio model class containing all elements of an Audio to be viewed in the application's Recycler View.
+ */
+
 @Entity(tableName = "audio_table")
 public class Audio {
 
@@ -38,6 +42,14 @@ public class Audio {
     @ColumnInfo(name = "file_path")
     private String mFilePath;
 
+    /**
+     * The Audio Constructor with all elements
+     *
+     * @param name     String
+     * @param length   String
+     * @param time     String
+     * @param filePath String
+     */
     public Audio(String name, String length, String time, String filePath) {
         this.mName = name;
         this.mLength = length;

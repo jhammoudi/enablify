@@ -16,29 +16,39 @@
 
 package com.hammoudij.enablify.api.TextToSpeech;
 
-import com.hammoudij.enablify.model.AudioConfig;
-import com.hammoudij.enablify.model.Input;
 import com.hammoudij.enablify.model.RetrofitModel;
-import com.hammoudij.enablify.model.Voice;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
+/**
+ * Api Interface for the Google Cloud API - Text-to-speech
+ */
+
 public interface ApiInterface {
 
+    /**
+     * Retrieves all Voices from the API GET call
+     */
     @GET("voices")
     Call<RetrofitModel> getVoices(@Query("key") String apiKey);
 
+    /**
+     * Retrieves all Voice types by passing in language Code in API GET call
+     * Passing in language code acts as a filter, and returns voice types that are compatible with the Language
+     */
     @GET("voices")
     Call<RetrofitModel> getVoiceType(
             @Query("languageCode") String languageCode,
             @Query("key") String apiKey);
 
+    /**
+     * Posting the RetrofitModel model to the API, and retrieving the base64 encoded audio string
+     */
     @Headers("Content-Type: application/json")
     @POST("./text:synthesize")
     Call<RetrofitModel> synthesizeText(

@@ -21,6 +21,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * The Voice model class containing all elements of an Voice for the Google Cloud API
+ * This model is used for the Google Text-to-speech API, where it determines the voice language and type, to create speech.
+ */
+
 public class Voice {
 
     @SerializedName("languageCodes")

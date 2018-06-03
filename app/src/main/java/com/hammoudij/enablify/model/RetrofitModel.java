@@ -21,6 +21,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * The RetrofitModel model class containing all elements of needed to create POST calls for the Google Cloud API, using the RetroFit2 API.
+ * This model is used for the Google Text-to-speech API, and encapsulates the other models which are need for POST calls, to receive speech.
+ */
+
 public class RetrofitModel {
 
     @SerializedName("input")
