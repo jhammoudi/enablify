@@ -1,8 +1,21 @@
+/*
+ * Copyright 2018 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.hammoudij.enablify.activity;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -18,7 +31,6 @@ import com.hammoudij.enablify.db.AppDatabase;
 import com.hammoudij.enablify.model.Audio;
 import com.hammoudij.enablify.presenter.AudioPresenter;
 
-import java.io.File;
 import java.util.List;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
@@ -58,11 +70,11 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     }
 
     private void removeItem(int position) {
-        mPresenter.removeItem(position, mAudioList,mDb,this);
+        mPresenter.removeItem(position, mAudioList, mDb, this);
     }
 
     private void shareItem(View v, int position) {
-        mPresenter.shareItem(v,position, mAudioList);
+        mPresenter.shareItem(v, position, mAudioList);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, View.OnCreateContextMenuListener {
@@ -87,7 +99,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            mPresenter.clickItem(v,position,mAudioList);
+            mPresenter.clickItem(v, position, mAudioList);
         }
 
         @Override

@@ -18,5 +18,15 @@
     <string name="download_error_string">Please wait for Language Code and Voice Type to download</string>
     <string name="synthesize_string">Synthesizing Text to Audio</string>
     <string name="refresh_string">Refresh</string>
+    <string name="share_audio_string">Share Audio File</string>
+    <string name="need_permission_string">Need Permissions</string>
+    <string name="need_permission_info_string">This app needs permission to use this feature. You can grant them in app settings.</string>
+    <string name="go_to_settings_string">GO TO SETTINGS</string>
+    <string name="cancel_string">Cancel</string>
+    <string name="package_string">package</string>
+
+    <string name="extract_text">Extracting text from image</string>
+    <string name="no_text_detected_string">No text was detected, Please try again</string>
+    <string name="please_refresh_string">\\n\\n Please refresh</string>
 
 </resources>

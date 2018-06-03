@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.hammoudij.enablify.MainMVP;
+import com.hammoudij.enablify.R;
 import com.hammoudij.enablify.activity.AudioAdapter;
 import com.hammoudij.enablify.activity.AudioListActivity;
 import com.hammoudij.enablify.db.AppDatabase;
@@ -26,7 +27,10 @@ import java.util.List;
 
 public class AudioPresenter implements MainMVP.AudioPresenter {
 
-    public void setUpActivity(RecyclerView recyclerView,Activity activity) {
+    public static final String AUDIO_MP3 = "audio/mp3";
+    public static final String FILEPROVIDER = ".fileprovider";
+
+    public void setUpActivity(RecyclerView recyclerView, Activity activity) {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
@@ -52,12 +56,12 @@ public class AudioPresenter implements MainMVP.AudioPresenter {
         Audio audio = audioList.get(position);
         String filePath = audio.getFilePath();
         File file = new File(filePath);
-        Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + ".fileprovider",file);
+        Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + FILEPROVIDER,file);
         Intent share = new Intent(Intent.ACTION_SEND);
         share.putExtra(Intent.EXTRA_STREAM, audioUri);
-        share.setType("audio/mp3");
+        share.setType(AUDIO_MP3);
         share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        v.getContext().startActivity(Intent.createChooser(share, "Share Audio File"));
+        v.getContext().startActivity(Intent.createChooser(share, v.getContext().getResources().getString(R.string.share_audio_string)));
     }
 
     public void clickItem(View v, int position, List<Audio> audioList) {
@@ -66,10 +70,10 @@ public class AudioPresenter implements MainMVP.AudioPresenter {
 
         File audioFile = new File(filePath);
 
-        Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + ".fileprovider",audioFile);
+        Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + FILEPROVIDER,audioFile);
 
         Intent play = new Intent(Intent.ACTION_VIEW);
-        play.setDataAndType(audioUri,"audio/mp3");
+        play.setDataAndType(audioUri,AUDIO_MP3);
         play.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         v.getContext().startActivity(play);
     }

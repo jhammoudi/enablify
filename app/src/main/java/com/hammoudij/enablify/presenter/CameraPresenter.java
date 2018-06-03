@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -34,6 +35,9 @@ import java.io.IOException;
 import static com.hammoudij.enablify.activity.MainCameraActivity.FIREBASE_TEXT;
 
 public class CameraPresenter implements MainMVP.CameraPresenter {
+
+    public static final int SETTINGS_REQUEST_CODE = 101;
+    public static final String TEMP_IMAGE = "tempImage";
 
     public void onToggleFlashClicked(boolean checked, Camera camera) {
 
@@ -62,16 +66,16 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
 
     public void showSettingsDialog(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Need Permissions");
-        builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
-        builder.setPositiveButton("GO TO SETTINGS", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.need_permission_string);
+        builder.setMessage(R.string.need_permission_info_string);
+        builder.setPositiveButton(R.string.go_to_settings_string, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
                 openSettings(activity);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel_string, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -82,9 +86,9 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
 
     public void openSettings(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+        Uri uri = Uri.fromParts(activity.getString(R.string.package_string), activity.getPackageName(), null);
         intent.setData(uri);
-        activity.startActivityForResult(intent, 101);
+        activity.startActivityForResult(intent, SETTINGS_REQUEST_CODE);
     }
 
     public Camera.PictureCallback getPictureCallback(final Activity activity) {
@@ -99,7 +103,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
     }
 
     private String createImageFromBitmap(Bitmap bitmap, Activity activity) {
-        String fileName = "tempImage";//no .png or .jpg needed
+        String fileName = TEMP_IMAGE;//no .png or .jpg needed
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -109,6 +113,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
             fo.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(activity.getLocalClassName(), e.getMessage());
             fileName = null;
         }
         return fileName;
@@ -132,7 +137,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Extracting text from Image");
+            dialog.setMessage(activity.getApplicationContext().getResources().getString(R.string.extract_text));
             dialog.show();
         }
 
@@ -149,7 +154,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
 
             Bitmap test = null;
             try {
-                test = BitmapFactory.decodeStream(activity.openFileInput("tempImage"));
+                test = BitmapFactory.decodeStream(activity.openFileInput(TEMP_IMAGE));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -168,7 +173,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
                                     if (!textFireBase.equals("")) {
                                         startIntent();
                                     } else {
-                                        Toast.makeText(activity, "No text was detected, Please try again", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(activity, R.string.no_text_detected_string, Toast.LENGTH_LONG).show();
                                     }
 
                                 }
@@ -177,6 +182,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
                             new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
+                                    Log.d(activity.getLocalClassName(), e.getMessage());
                                     // Task failed with an exception
                                     //Generic exception must be handled as it is overridden
                                     e.printStackTrace();
@@ -209,11 +215,12 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
         return s.toString();
     }
 
-    public Camera checkDeviceCamera() {
+    public Camera checkDeviceCamera(Activity activity) {
         Camera camera = null;
         try {
             camera = Camera.open();
         } catch (Exception e) {
+            Log.d(activity.getLocalClassName(), e.getMessage());
             //There are no specific exceptions to handle when opening the Camera
             //however want to catch all kinds of errors that may occur, as it is appropriate
             e.printStackTrace();
