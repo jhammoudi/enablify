@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,10 +23,13 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextDetector;
 import com.hammoudij.enablify.MainMVP;
+import com.hammoudij.enablify.R;
+import com.hammoudij.enablify.api.Camera.CameraPreview;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static com.hammoudij.enablify.activity.MainCameraActivity.FIREBASE_TEXT;
 
@@ -50,9 +55,9 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
         camera.takePicture(null, null, getPictureCallback(activity));
     }
 
-    public void startIntent(Activity activity, Class c, int requestCode) {
+    public void startIntent(Activity activity, Class c) {
         Intent intent = new Intent(activity, c);
-        activity.startActivityForResult(intent, requestCode);
+        activity.startActivity(intent);
     }
 
     public void showSettingsDialog(final Activity activity) {
@@ -86,7 +91,6 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
         Camera.PictureCallback picture = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
-
                 Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 createImageFromBitmap(cameraBitmap, activity);
             }
@@ -103,7 +107,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
             fo.write(bytes.toByteArray());
             // remember close file output
             fo.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             fileName = null;
         }
@@ -158,8 +162,15 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
                             new OnSuccessListener<FirebaseVisionText>() {
                                 @Override
                                 public void onSuccess(FirebaseVisionText texts) {
-                                    intent.putExtra(FIREBASE_TEXT, getTextFromFireBase(texts));
-                                    startIntent();
+                                    String textFireBase = getTextFromFireBase(texts);
+                                    intent.putExtra(FIREBASE_TEXT, textFireBase);
+
+                                    if (!textFireBase.equals("")) {
+                                        startIntent();
+                                    } else {
+                                        Toast.makeText(activity, "No text was detected, Please try again", Toast.LENGTH_LONG).show();
+                                    }
+
                                 }
                             })
                     .addOnFailureListener(
@@ -167,6 +178,7 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     // Task failed with an exception
+                                    //Generic exception must be handled as it is overridden
                                     e.printStackTrace();
                                 }
                             });
@@ -195,6 +207,18 @@ public class CameraPresenter implements MainMVP.CameraPresenter {
         }
 
         return s.toString();
+    }
+
+    public Camera checkDeviceCamera() {
+        Camera camera = null;
+        try {
+            camera = Camera.open();
+        } catch (Exception e) {
+            //There are no specific exceptions to handle when opening the Camera
+            //however want to catch all kinds of errors that may occur, as it is appropriate
+            e.printStackTrace();
+        }
+        return camera;
     }
 
 }

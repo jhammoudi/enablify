@@ -9,6 +9,9 @@ import com.hammoudij.enablify.model.Audio;
 
 @Database(entities = {Audio.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
+
+    public static final String DATABASE_NAME = "production";
+
     public abstract AudioDao audioDao();
 
     private static AppDatabase INSTANCE;
@@ -18,7 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "production")
+                            AppDatabase.class, DATABASE_NAME)
                             .fallbackToDestructiveMigration()
                             .allowMainThreadQueries()
                             .build();

@@ -4,41 +4,68 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
+import com.hammoudij.enablify.activity.AudioAdapter;
 import com.hammoudij.enablify.api.Camera.CameraPreview;
+import com.hammoudij.enablify.api.TextToSpeech.ApiInterface;
+import com.hammoudij.enablify.db.AppDatabase;
+import com.hammoudij.enablify.model.Audio;
+import com.hammoudij.enablify.model.AudioConfig;
+import com.hammoudij.enablify.model.Input;
+import com.hammoudij.enablify.model.Voice;
+
+import java.util.List;
 
 public interface MainMVP {
 
     interface CameraPresenter{
-
         void onToggleFlashClicked(boolean checked, Camera camera);
         void onCaptureBtnClick(Camera camera, Activity activity);
-        void startIntent(Activity activity, Class c, int requestCode);
-//        void connectCamera(Activity activity);
+        void startIntent(Activity activity, Class c);
         void showSettingsDialog(final Activity activity);
         void openSettings(Activity activity);
-//        Camera checkDeviceCamera();
-//        void onResume(Activity activity, Camera camera);
-//        void releaseCamera(Camera camera, CameraPreview cameraPreview);
         Camera.PictureCallback getPictureCallback(final Activity activity);
         void runTextRecognition(Activity activity,Class c);
         String getTextFromFireBase(FirebaseVisionText texts);
+        Camera checkDeviceCamera();
     }
 
     interface AudioPresenter{
-
+        void setUpActivity(RecyclerView recyclerView,Activity activity);
+        void removeItem(int position, List<Audio> audioList, AppDatabase db, AudioAdapter audioAdapter);
+        void shareItem(View v, int position, List<Audio> audioList);
+        void clickItem(View v, int position, List<Audio> audioList);
     }
 
+    interface CreateAudioPresenter {
 
-    interface EnablifyView{
+        void getLanguageCodeDoInBackground(ApiInterface apiService,
+                                           String API_KEY, final List<String> listOfLanguageCodes,
+                                           final List<String> listOfLanguages,
+                                           final ArrayAdapter<String> langSpinnerAdapter,
+                                           final Spinner languageCodeSpinner,
+                                           final Activity activity);
 
+        void getVoiceTypeDoInBackground(ApiInterface apiService,
+                                        String languageCode,
+                                        String API_KEY,
+                                        final List<String> listOfVoiceTypes,
+                                        final ArrayAdapter<String> voiceSpinnerAdapt,
+                                        final Spinner voiceTypeSpinner,
+                                        final Activity activity);
 
-
-         //                                                 I am writing a test
-
-
-
-
+        void synthesizeTextDoInBackground(Input input,
+                                          Voice voice,
+                                          AudioConfig audioConfig,
+                                          ApiInterface apiService,
+                                          String API_KEY,
+                                          final Activity activity,
+                                          final String audioName,
+                                          final AppDatabase db);
     }
 }

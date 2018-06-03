@@ -131,6 +131,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.stopPreview();
         } catch (Exception e){
+            //There are no specific exceptions to handle when opening the Camera
+            //however want to catch all kinds of errors that may occur, as it is appropriate
             // ignore: tried to stop a non-existent preview
         }
 
@@ -143,7 +145,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
 
         } catch (Exception e){
-            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+            //There are no specific exceptions to handle when opening the Camera
+            //however want to catch all kinds of errors that may occur, as it is appropriate
+            e.printStackTrace();
         }
     }
 }

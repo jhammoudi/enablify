@@ -6,9 +6,6 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.camera2.full" />
@@ -23,6 +20,7 @@
 
         <activity
             android:name=".activity.MainCameraActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/splashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,13 +30,11 @@
         </activity>
 
         <activity
-            android:name=".activity.SettingsActivity"
-            android:label="@string/title_activity_settings">
-        </activity>
-
-        <activity
             android:name=".activity.AudioListActivity"
             android:label="@string/title_activity_audio_list">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".activity.CreateAudioActivity"
@@ -48,7 +44,6 @@
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="text" />
-
 
         <provider
             android:name="android.support.v4.content.FileProvider"

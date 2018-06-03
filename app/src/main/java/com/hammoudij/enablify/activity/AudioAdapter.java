@@ -12,22 +12,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.hammoudij.enablify.MainMVP;
 import com.hammoudij.enablify.R;
 import com.hammoudij.enablify.db.AppDatabase;
 import com.hammoudij.enablify.model.Audio;
+import com.hammoudij.enablify.presenter.AudioPresenter;
 
 import java.io.File;
 import java.util.List;
 
-class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
+public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
 
     private List<Audio> mAudioList;
-    private AppDatabase db;
-
+    private MainMVP.AudioPresenter mPresenter;
+    private AppDatabase mDb;
 
     public AudioAdapter(List<Audio> audioList, AppDatabase db) {
         this.mAudioList = audioList;
-        this.db = db;
+        this.mDb = db;
+        setupMVP();
+    }
+
+    private void setupMVP() {
+        mPresenter = new AudioPresenter();
     }
 
     @Override
@@ -35,14 +42,14 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.audio_item, parent, false);
 
-        return new ViewHolder(itemView, mAudioList);
+        return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(AudioAdapter.ViewHolder holder, int position) {
-        holder.name.setText(mAudioList.get(position).getName());
-        holder.length.setText(mAudioList.get(position).getLength());
-        holder.time.setText(mAudioList.get(position).getTime());
+        holder.mName.setText(mAudioList.get(position).getName());
+        holder.mLength.setText(mAudioList.get(position).getLength());
+        holder.mTime.setText(mAudioList.get(position).getTime());
     }
 
     @Override
@@ -50,58 +57,37 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
         return mAudioList.size();
     }
 
-    public void removeItem(int position) {
-        Audio audio = mAudioList.get(position);
-        mAudioList.remove(position);
-        db.audioDao().delete(audio);
-        notifyItemRemoved(position);
+    private void removeItem(int position) {
+        mPresenter.removeItem(position, mAudioList,mDb,this);
     }
 
     private void shareItem(View v, int position) {
-
-        Audio audio = mAudioList.get(position);
-        String filePath = audio.getFilePath();
-        File file = new File(filePath);
-        Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + ".fileprovider",file);
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.putExtra(Intent.EXTRA_STREAM, audioUri);
-        share.setType("audio/mp3");
-        share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        v.getContext().startActivity(Intent.createChooser(share, "Share Audio File"));
+        mPresenter.shareItem(v,position, mAudioList);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, View.OnCreateContextMenuListener {
 
-        public TextView name;
-        public TextView length;
-        public TextView time;
-        public int position = 0;
+        private static final int FIRST_MENU_ITEM = 1;
+        private static final int SECOND_MENU_ITEM = 2;
+        private TextView mName;
+        private TextView mLength;
+        private TextView mTime;
+        private int mPosition = 0;
 
-
-        public ViewHolder(View itemView, List<Audio> mAudioList) {
+        private ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             itemView.setOnCreateContextMenuListener(this);
-            name = itemView.findViewById(R.id.audio_name);
-            length = itemView.findViewById(R.id.audio_length);
-            time = itemView.findViewById(R.id.audio_date_time);
+            mName = itemView.findViewById(R.id.audio_name);
+            mLength = itemView.findViewById(R.id.audio_length);
+            mTime = itemView.findViewById(R.id.audio_date_time);
         }
 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            Audio audio = mAudioList.get(position);
-            String filePath = audio.getFilePath();
-
-            File audioFile = new File(filePath);
-
-            Uri audioUri = FileProvider.getUriForFile(v.getContext(),v.getContext().getApplicationInfo().packageName + ".fileprovider",audioFile);
-
-            Intent play = new Intent(Intent.ACTION_VIEW);
-            play.setDataAndType(audioUri,"audio/mp3");
-            play.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            v.getContext().startActivity(play);
+            mPresenter.clickItem(v,position,mAudioList);
         }
 
         @Override
@@ -111,18 +97,19 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
             return true;
         }
 
-        public void setMenuPosition(int position) {
-            this.position = position;
+        private void setMenuPosition(int position) {
+            this.mPosition = position;
         }
 
-        public int getMenuPosition() {
-            return position;
+        private int getMenuPosition() {
+            return mPosition;
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            MenuItem delete = menu.add(Menu.NONE, 1, 1, "Delete");
-            MenuItem share = menu.add(Menu.NONE, 2, 2, "Share");
+
+            MenuItem delete = menu.add(Menu.NONE, FIRST_MENU_ITEM, FIRST_MENU_ITEM, v.getResources().getString(R.string.delete_string));
+            MenuItem share = menu.add(Menu.NONE, SECOND_MENU_ITEM, SECOND_MENU_ITEM, v.getResources().getString(R.string.share_string));
             delete.setOnMenuItemClickListener(onEditMenu);
             share.setOnMenuItemClickListener(onEditMenu);
         }
@@ -132,11 +119,11 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
             public boolean onMenuItemClick(MenuItem item) {
 
                 switch (item.getItemId()) {
-                    case 1:
+                    case FIRST_MENU_ITEM:
                         removeItem(getMenuPosition());
                         break;
 
-                    case 2:
+                    case SECOND_MENU_ITEM:
                         shareItem(itemView, getMenuPosition());
                         break;
                 }
@@ -144,5 +131,4 @@ class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
             }
         };
     }
-
 }

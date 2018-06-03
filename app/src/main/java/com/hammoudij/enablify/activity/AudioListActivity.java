@@ -9,9 +9,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
+import com.hammoudij.enablify.MainMVP;
 import com.hammoudij.enablify.R;
 import com.hammoudij.enablify.db.AppDatabase;
 import com.hammoudij.enablify.model.Audio;
+import com.hammoudij.enablify.presenter.AudioPresenter;
+import com.hammoudij.enablify.presenter.CameraPresenter;
 
 import java.util.List;
 
@@ -23,27 +26,16 @@ public class AudioListActivity extends AppCompatActivity {
     @BindView(R.id.audio_recycler_view)
     public RecyclerView mRecyclerView;
 
-    List<Audio> audioList;
-
-    private AudioAdapter mAudioAdapter;
+    private MainMVP.AudioPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_list);
+        setupMVP();
         ButterKnife.bind(this);
         setupActionBar();
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
-
-        AppDatabase db = AppDatabase.getDatabase(this);
-
-        audioList = db.audioDao().getAllAudio();
-        mAudioAdapter = new AudioAdapter(audioList, db);
-        mRecyclerView.setAdapter(mAudioAdapter);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
+        mPresenter.setUpActivity(mRecyclerView,this);
     }
 
     private void setupActionBar() {
@@ -52,6 +44,10 @@ public class AudioListActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private void setupMVP() {
+        mPresenter = new AudioPresenter();
     }
 
     @Override

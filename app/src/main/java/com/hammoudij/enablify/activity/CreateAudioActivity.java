@@ -1,5 +1,6 @@
 package com.hammoudij.enablify.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hammoudij.enablify.MainMVP;
 import com.hammoudij.enablify.R;
 import com.hammoudij.enablify.api.TextToSpeech.ApiClient;
 import com.hammoudij.enablify.api.TextToSpeech.ApiInterface;
@@ -29,6 +31,7 @@ import com.hammoudij.enablify.model.AudioConfig;
 import com.hammoudij.enablify.model.Input;
 import com.hammoudij.enablify.model.RetrofitModel;
 import com.hammoudij.enablify.model.Voice;
+import com.hammoudij.enablify.presenter.CreateAudioPresenter;
 import com.warkiz.widget.IndicatorSeekBar;
 
 import java.io.File;
@@ -38,6 +41,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,6 +53,10 @@ import retrofit2.Response;
 import static com.hammoudij.enablify.activity.MainCameraActivity.FIREBASE_TEXT;
 
 public class CreateAudioActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    public static final String ENCODING_MP3 = "MP3";
+    public static final int PITCH_SEEKBAR_DEFAULT = 0;
+    public static final int SPEED_SEEKBAR_DEFAULT = 1;
 
     @BindView(R.id.audio_name)
     public EditText mAudioNameEditTxt;
@@ -74,18 +82,19 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
     @BindView(R.id.speed_seek_bar)
     public IndicatorSeekBar mSpeedSeekBar;
 
+    private MainMVP.CreateAudioPresenter mPresenter;
+
     private List<String> mListOfLanguageCodes = new ArrayList<>();
+    private List<String> mListOfLanguages = new ArrayList<>();
     private List<String> mListOfVoiceTypes = new ArrayList<>();
 
-    ApiInterface apiService =
-            ApiClient.getClient().create(ApiInterface.class);
+    ApiInterface mApiService = ApiClient.getClient().create(ApiInterface.class);
 
     ArrayAdapter<String> mLanguageSpinnerAdapter;
     ArrayAdapter<String> mVoiceSpinnerAdapter;
 
     Intent intent;
 
-    private static final String TAG = CreateAudioActivity.class.getSimpleName();
     private final static String API_KEY = "AIzaSyCNvZKnuFSzUffWpiKWrYLKCg4KeEjaNJM";
 
     @Override
@@ -94,7 +103,7 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         setContentView(R.layout.activity_create_audio);
         setupActionBar();
         ButterKnife.bind(this);
-
+        setupMVP();
         intent = getIntent();
 
         mImageText.setText(intent.getStringExtra(FIREBASE_TEXT));
@@ -103,6 +112,10 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         mLanguageCodeSpinner.setOnItemSelectedListener(this);
         mVoiceTypeSpinner.setEnabled(false);
         mLanguageCodeSpinner.setEnabled(false);
+    }
+
+    private void setupMVP() {
+        mPresenter = new CreateAudioPresenter();
     }
 
     @Override
@@ -118,21 +131,21 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         if (mAudioNameEditTxt.getText().toString().equals("")) {
 
             mAudioNameEditTxt.requestFocus();
-            mAudioNameTextInput.setError("Please enter Name");
+            mAudioNameTextInput.setError(getResources().getString(R.string.audio_name_error_string));
 
         } else if (!mVoiceTypeSpinner.isEnabled() && !mLanguageCodeSpinner.isEnabled()) {
-            Toast.makeText(CreateAudioActivity.this, "Please wait for Language Code and Voice Type to download", Toast.LENGTH_LONG).show();
+            Toast.makeText(CreateAudioActivity.this, getResources().getString(R.string.download_error_string), Toast.LENGTH_LONG).show();
         } else {
 
             Input input = new Input();
             input.setText(intent.getStringExtra(FIREBASE_TEXT));
 
             Voice voice = new Voice();
-            voice.setLanguageCode(mLanguageCodeSpinner.getSelectedItem().toString());
+            voice.setLanguageCode(mListOfLanguageCodes.get(mLanguageCodeSpinner.getSelectedItemPosition()));
             voice.setName(mVoiceTypeSpinner.getSelectedItem().toString());
 
             AudioConfig audioConfig = new AudioConfig();
-            audioConfig.setAudioEncoding("MP3");
+            audioConfig.setAudioEncoding(ENCODING_MP3);
             audioConfig.setPitch(mPitchSeekBar.getProgress());
             audioConfig.setSpeakingRate(mSpeedSeekBar.getProgress());
 
@@ -159,8 +172,8 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
                 new GetLanguageCodeAsyncTask().execute();
                 mImageText.setText(intent.getStringExtra(FIREBASE_TEXT));
                 mAudioNameEditTxt.setText(null);
-                mPitchSeekBar.setProgress(0);
-                mSpeedSeekBar.setProgress(1);
+                mPitchSeekBar.setProgress(PITCH_SEEKBAR_DEFAULT);
+                mSpeedSeekBar.setProgress(SPEED_SEEKBAR_DEFAULT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -169,7 +182,8 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int i, long l) {
 
-        new GetVoiceTypeAsyncTask(parent.getItemAtPosition(i).toString()).execute();
+        String languageCode = mListOfLanguageCodes.get(i);
+        new GetVoiceTypeAsyncTask(languageCode).execute();
     }
 
     @Override
@@ -191,40 +205,11 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-            Call<RetrofitModel> call = apiService.getVoices(API_KEY);
-            call.enqueue(new Callback<RetrofitModel>() {
-                @Override
-                public void onResponse(Call<RetrofitModel> call, Response<RetrofitModel> response) {
-                    List<Voice> voices = response.body().getVoices();
-                    for (int i = 0; i < voices.size(); i++) {
-                        if (!mListOfLanguageCodes.contains(voices.get(i).getLanguageCodes().get(0))) {
-                            mListOfLanguageCodes.add(voices.get(i).getLanguageCodes().get(0));
-                        }
-                    }
-
-                    mLanguageSpinnerAdapter = new ArrayAdapter<String>(getApplicationContext(),
-                            android.R.layout.simple_spinner_item,
-                            mListOfLanguageCodes);
-
-                    mLanguageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    mLanguageCodeSpinner.setAdapter(mLanguageSpinnerAdapter); // this will set list of values to spinner
-                    mLanguageCodeSpinner.setEnabled(true);
-                }
-
-                @Override
-                public void onFailure(Call<RetrofitModel> call, Throwable t) {
-                    // Log error here since request failed
-
-                    Toast.makeText(CreateAudioActivity.this, t.getMessage() + "\n\n Please refresh", Toast.LENGTH_LONG).show();
-                    Log.e(TAG, t.toString());
-                }
-            });
-
+            mPresenter.getLanguageCodeDoInBackground(mApiService,API_KEY,mListOfLanguageCodes,mListOfLanguages,
+                    mLanguageSpinnerAdapter,mLanguageCodeSpinner,CreateAudioActivity.this);
             return null;
         }
     }
-
 
     private class GetVoiceTypeAsyncTask extends AsyncTask<Void, Void, Void> {
 
@@ -248,35 +233,8 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         @Override
         protected Void doInBackground(Void... voids) {
 
-            Call<RetrofitModel> call = apiService.getVoiceType(languageCode, API_KEY);
-            call.enqueue(new Callback<RetrofitModel>() {
-                @Override
-                public void onResponse(Call<RetrofitModel> call, Response<RetrofitModel> response) {
-
-                    mListOfVoiceTypes.clear();
-
-                    List<Voice> voices = response.body().getVoices();
-                    for (int i = 0; i < voices.size(); i++) {
-                        if (!mListOfVoiceTypes.contains(voices.get(i).getName())) {
-                            mListOfVoiceTypes.add(voices.get(i).getName());
-                        }
-                    }
-
-                    mVoiceSpinnerAdapter = new ArrayAdapter<String>(getApplicationContext(),
-                            android.R.layout.simple_spinner_item,
-                            mListOfVoiceTypes);
-
-                    mVoiceSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    mVoiceTypeSpinner.setAdapter(mVoiceSpinnerAdapter); // this will set list of values to spinner
-                }
-
-                @Override
-                public void onFailure(Call<RetrofitModel> call, Throwable t) {
-                    // Log error here since request failed
-                    Toast.makeText(CreateAudioActivity.this, t.getMessage() + "\n\n Please refresh", Toast.LENGTH_LONG).show();
-                    Log.e(TAG, t.toString());
-                }
-            });
+            mPresenter.getVoiceTypeDoInBackground(mApiService,languageCode,API_KEY,mListOfVoiceTypes,
+                    mVoiceSpinnerAdapter,mVoiceTypeSpinner,CreateAudioActivity.this);
 
             return null;
         }
@@ -289,95 +247,36 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         AudioConfig audioConfig;
         AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
         String mAudioName;
+        ProgressDialog dialog;
 
         public SynthesizeTextAsyncTask(Input input, Voice voice, AudioConfig audioConfig) {
             this.input = input;
             this.voice = voice;
             this.audioConfig = audioConfig;
+            this.dialog = new ProgressDialog(CreateAudioActivity.this);
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            dialog.setMessage(getResources().getString(R.string.synthesize_string));
+            dialog.show();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
 
-            RetrofitModel retrofitModel = new RetrofitModel();
-            retrofitModel.setInput(input);
-            retrofitModel.setVoice(voice);
-            retrofitModel.setAudioConfig(audioConfig);
-
-            Call<RetrofitModel> call = apiService.synthesizeText(retrofitModel, API_KEY);
-            call.enqueue(new Callback<RetrofitModel>() {
-                @Override
-                public void onResponse(Call<RetrofitModel> call, Response<RetrofitModel> response) {
-
-                    //Base64-Encoded Audio Content
-                    String audioContent = response.body().getAudioContent();
-                    Log.d("RESULT", audioContent);
-
-
-                    //use audiocontent and create audio file and save to local storage, save filepath
-                    byte[] audioAsBytes = Base64.decode(audioContent, 0);
-                    Log.d("RESULT-DECODE", audioAsBytes.toString());
-
-
-                    File root = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-                    //File root = Environment.getExternalStorageDirectory();
-                    File folder = new File(root.getAbsoluteFile(),"Enablify");
-
-                    if (!folder.exists()) {
-                        folder.mkdirs();
-                    }
-
-                    String fileName = folder.getAbsolutePath()  + "/"+
-                            String.valueOf(System.currentTimeMillis() + ".mp3");
-
-
-                    try (OutputStream out = new FileOutputStream(fileName)) {
-                        out.write(audioAsBytes);
-                        out.flush();
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    Log.d("RESULT-FILEPATH", fileName);
-
-                    //String filePath = "http://techslides.com/demos/samples/sample.mp3";
-
-                    mAudioName = mAudioNameEditTxt.getText().toString();
-
-                    String dateTime = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-
-                    String durationStr = "00:00";
-
-                    Audio audio = new Audio(mAudioName, durationStr, dateTime, fileName);
-
-                    db.audioDao().insertAll(audio);
-                    Intent i = new Intent(getApplicationContext(), AudioListActivity.class);
-                    i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    i.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    finish();
-                    startActivity(i);
-                }
-
-                @Override
-                public void onFailure(Call<RetrofitModel> call, Throwable t) {
-                    // Log error here since request failed
-                    Toast.makeText(CreateAudioActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-
-                    Log.e(TAG, t.toString());
-                }
-            });
-
+            mAudioName = mAudioNameEditTxt.getText().toString();
+            mPresenter.synthesizeTextDoInBackground(input,voice,audioConfig,mApiService,API_KEY,
+                    CreateAudioActivity.this,mAudioName,db);
             return null;
         }
     }

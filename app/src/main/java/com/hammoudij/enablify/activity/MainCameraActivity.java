@@ -27,18 +27,17 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
-public class MainCameraActivity extends AppCompatActivity implements MainMVP.EnablifyView {
+public class MainCameraActivity extends AppCompatActivity {
 
     public static final String FIREBASE_TEXT = "Firebase";
+    public static final int PORTRAIT_ORIENTATION = 90;
     private Camera mCamera;
     private CameraPreview mPreview;
     private MainMVP.CameraPresenter mPresenter;
+    boolean shouldExecuteOnResume;
 
     @BindView(R.id.capture_btn)
     Button mCaptureBtn;
-
-    @BindView(R.id.settings_btn)
-    Button mSettingsBtn;
 
     @BindView(R.id.confirm_image_btn)
     Button mConfirmBtn;
@@ -65,8 +64,8 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
         setTheme(R.style.splashScreenTheme);
         setupMVP();
         askCameraPermissions();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
+        shouldExecuteOnResume = false;
     }
 
     private void setupMVP() {
@@ -97,14 +96,9 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
         mPresenter.runTextRecognition(this, CreateAudioActivity.class);
     }
 
-    @OnClick(R.id.settings_btn)
-    public void onSettingsBtnClick() {
-        mPresenter.startIntent(this, SettingsActivity.class, 2);
-    }
-
     @OnClick(R.id.audio_list_btn)
     public void onAudioListBtnClick() {
-        mPresenter.startIntent(this, AudioListActivity.class, 3);
+        mPresenter.startIntent(this, AudioListActivity.class);
     }
 
     public void askCameraPermissions() {
@@ -116,7 +110,6 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
                     public void onPermissionGranted(PermissionGrantedResponse response) {
                         connectCamera();
                         // permission is granted, open the camera
-                        //Log.d("Test","askCameraPermission");
                     }
 
                     @Override
@@ -136,22 +129,12 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
 
     public void connectCamera() {
         // Create an instance of Camera
-        mCamera = checkDeviceCamera();
+        mCamera = mPresenter.checkDeviceCamera();
         // Create our Preview view and set it as the content of our activity.
-        mCamera.setDisplayOrientation(90);
+        mCamera.setDisplayOrientation(PORTRAIT_ORIENTATION);
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
-    }
-
-    public Camera checkDeviceCamera() {
-        Camera camera = null;
-        try {
-            camera = Camera.open();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return camera;
     }
 
     public void releaseCamera() {
@@ -176,8 +159,12 @@ public class MainCameraActivity extends AppCompatActivity implements MainMVP.Ena
         mMainCameraButtons.setVisibility(View.VISIBLE);
         mVerifyImageButtons.setVisibility(View.INVISIBLE);
 
-        if (mCamera == null) {
-            connectCamera();
+        if(shouldExecuteOnResume){
+            if (mCamera == null) {
+                connectCamera();
+            }
+        } else{
+            shouldExecuteOnResume = true;
         }
     }
 }
