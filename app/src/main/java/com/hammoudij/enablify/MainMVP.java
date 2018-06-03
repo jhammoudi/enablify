@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.hardware.Camera;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
@@ -73,12 +72,10 @@ public interface MainMVP {
     interface CreateAudioPresenter {
 
         void getLanguageCodeDoInBackground(ApiInterface apiService, String API_KEY, final List<String> listOfLanguageCodes,
-                                           final List<String> listOfLanguages, final ArrayAdapter<String> langSpinnerAdapter,
-                                           final Spinner languageCodeSpinner, final Activity activity);
+                                           final List<String> listOfLanguages, final Spinner languageCodeSpinner, final Activity activity);
 
         void getVoiceTypeDoInBackground(ApiInterface apiService, String languageCode, String API_KEY,
-                                        final List<String> listOfVoiceTypes, final ArrayAdapter<String> voiceSpinnerAdapt,
-                                        final Spinner voiceTypeSpinner, final Activity activity);
+                                        final List<String> listOfVoiceTypes, final Spinner voiceTypeSpinner, final Activity activity);
 
         void synthesizeTextDoInBackground(Input input, Voice voice, AudioConfig audioConfig, ApiInterface apiService,
                                           String API_KEY, final Activity activity, final String audioName, final AppDatabase db);

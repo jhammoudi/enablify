@@ -27,6 +27,9 @@
 
     <string name="extract_text">Extracting text from image</string>
     <string name="no_text_detected_string">No text was detected, Please try again</string>
-    <string name="please_refresh_string">\\n\\n Please refresh</string>
+    <string name="please_refresh_string">\n\n Please refresh</string>
+    <string name="minute_string">\u0020min\u0020</string>
+    <string name="seconds_string">\u0020sec</string>
+    <string name="rotate_camera_for_text_recognition_string">ROTATE PHONE 90 DEGREES ANTI-CLOCKWISE</string>
 
 </resources>

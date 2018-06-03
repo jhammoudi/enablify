@@ -142,6 +142,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      * Similar to onCreate method in an Activity class
      */
     public void surfaceCreated(SurfaceHolder holder) {
+
+        //TODO Create dynamic rotation of camera sensor to enable user to rotate phone, and still detect text in image
+        //The default rotation to recognise text is to spin phone 90 degrees anti-clockwise, in landscape mode.
+
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
             mCamera.setPreviewDisplay(holder);

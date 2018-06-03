@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.hammoudij.enablify.MainMVP;
@@ -226,6 +227,8 @@ public class MainCameraActivity extends AppCompatActivity {
 
         mMainCameraButtons.setVisibility(View.VISIBLE);
         mVerifyImageButtons.setVisibility(View.INVISIBLE);
+
+        Toast.makeText(this, R.string.rotate_camera_for_text_recognition_string, Toast.LENGTH_LONG).show();
 
         //this if statement is to ensure that the camera is not connected before permissions are given
         // as onResume is called after onCreate, if permission are not given yet, the app will crash as it can not connect

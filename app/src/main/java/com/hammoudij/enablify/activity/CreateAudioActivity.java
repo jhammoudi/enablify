@@ -262,7 +262,7 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         protected Void doInBackground(Void... voids) {
             //get the language code from the presenter
             mPresenter.getLanguageCodeDoInBackground(mApiService, API_KEY, mListOfLanguageCodes, mListOfLanguages,
-                    mLanguageSpinnerAdapter, mLanguageCodeSpinner, CreateAudioActivity.this);
+                    mLanguageCodeSpinner, CreateAudioActivity.this);
             return null;
         }
     }
@@ -305,7 +305,7 @@ public class CreateAudioActivity extends AppCompatActivity implements AdapterVie
         protected Void doInBackground(Void... voids) {
             //get the voice type from the presenter using language code
             mPresenter.getVoiceTypeDoInBackground(mApiService, languageCode, API_KEY, mListOfVoiceTypes,
-                    mVoiceSpinnerAdapter, mVoiceTypeSpinner, CreateAudioActivity.this);
+                    mVoiceTypeSpinner, CreateAudioActivity.this);
 
             return null;
         }
